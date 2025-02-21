@@ -13,6 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+lib/
 
 # Built application files
 *.apk
