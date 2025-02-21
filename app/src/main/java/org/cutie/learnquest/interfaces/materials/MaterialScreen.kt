@@ -23,8 +23,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -32,7 +31,8 @@ fun MaterialScreen(
     charts: List<KtorApiClient.ChartMetadata>,
     isLoading: Boolean = false,
     onRefresh: () -> Unit = {},
-    onPdfClick: (KtorApiClient.ChartMetadata) -> Unit = {}
+    onPdfClick: (KtorApiClient.ChartMetadata) -> Unit = {},
+    onBackClicked: () -> Unit = {}
 ) {
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isLoading,
@@ -108,6 +108,20 @@ fun MaterialScreen(
                 backgroundColor = Color.White,
                 contentColor = Color(0xFFE57373)
             )
+        }
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Button(
+                onClick = onBackClicked,
+                modifier = Modifier
+                    .fillMaxWidth(0.5f) // Make it smaller than full width
+                    .height(48.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+            ) {
+                Text(text = "Go back", color = Color.Black)
+            }
         }
     }
 }
@@ -235,4 +249,10 @@ private fun LoadingCard() {
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun MaterialScreenPreview() {
+    MaterialScreen(charts = emptyList())
 }

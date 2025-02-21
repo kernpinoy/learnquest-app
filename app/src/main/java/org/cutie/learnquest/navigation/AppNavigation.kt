@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import org.cutie.learnquest.data.CookieStorage
+import org.cutie.learnquest.interfaces.mainmenu.AudioManager
 import org.cutie.learnquest.minigames.colors.matchit.ColorGameScreen
 import org.cutie.learnquest.minigames.letters.matchit.LetterGameScreen
 import org.cutie.learnquest.minigames.numbers.matchit.NumberGameScreen
@@ -23,52 +24,67 @@ import org.cutie.learnquest.navigation.screens.Register
 fun AppNavigation() {
     val navController = rememberNavController()
     val context = LocalContext.current
-
-    // Track if session has been checked
     val hasCheckedSession = remember { mutableStateOf(false) }
-
-    // Loading state to delay navigation until session check is done
     val loading = remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
+        // ✅ Initialize AudioManager with context
+        AudioManager.initialize(context)
+
         val cookieStorage = CookieStorage(context)
         val sessionCookie = cookieStorage.getCookie("auth_session")
-
-        // Set session check state and update loading state
         hasCheckedSession.value = sessionCookie != null
-        loading.value = false // Once session is checked, stop loading
+        loading.value = false
     }
 
-    // Only show NavHost after session check is completed
     if (!loading.value) {
-        NavHost(navController = navController, startDestination = if (hasCheckedSession.value) Screen.MainMenu.route else Screen.Login.route) {
+        NavHost(
+            navController = navController,
+            startDestination = if (hasCheckedSession.value) Screen.MainMenu.route else Screen.Login.route
+        ) {
             composable(Screen.Login.route) {
+                AudioManager.stopMusic(context)
                 Login(navController)
             }
             composable(Screen.MainMenu.route) {
+                if (!AudioManager.isPlaying() && !AudioManager.wasPausedByUser()) {
+                    AudioManager.startOrResumeMusic(context) // ✅ Pass context
+                }
                 MainMenu(navController)
             }
             composable(Screen.Register.route) {
+                AudioManager.stopMusic(context)
                 Register(navController)
             }
             composable(Screen.Materials.route) {
+                if (!AudioManager.isPlaying() && !AudioManager.wasPausedByUser()) {
+                    AudioManager.startOrResumeMusic(context)
+                }
                 Materials(navController)
             }
             composable(Screen.Activities.route) {
+                if (!AudioManager.isPlaying() && !AudioManager.wasPausedByUser()) {
+                    AudioManager.startOrResumeMusic(context)
+                }
                 Activities(navController)
             }
             composable(Screen.ShapesGame.route) {
+                AudioManager.pauseMusic(context)
                 ShapesGameScreen()
             }
             composable(Screen.LetterGame.route) {
+                AudioManager.pauseMusic(context)
                 LetterGameScreen()
             }
             composable(Screen.NumbersGame.route) {
+                AudioManager.pauseMusic(context)
                 NumberGameScreen()
             }
             composable(Screen.ColorGame.route) {
+                AudioManager.pauseMusic(context)
                 ColorGameScreen()
             }
         }
     }
 }
+

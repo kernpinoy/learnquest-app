@@ -63,7 +63,10 @@ fun Materials(navController: NavController) {
             charts = getChartsResult?.getOrNull() ?: emptyList(),
             isLoading = getChartsResult == null || materialViewModel.isRefreshing.value,
             onRefresh = { materialViewModel.refresh() },
-            onPdfClick = { chart -> materialViewModel.fetchChart(chart) }
+            onPdfClick = { chart -> materialViewModel.fetchChart(chart) },
+            onBackClicked = {
+                navController.popBackStack()
+            }
         )
     }
 }
